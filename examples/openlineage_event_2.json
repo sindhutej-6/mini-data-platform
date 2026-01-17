@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-01-17T06:28:30.104633",
+  "job": {
+    "name": "openfoodfacts_validation"
+  },
+  "run": {
+    "id": "6503dd45-17eb-41a9-81ec-5df5833c4244"
+  },
+  "inputs": [
+    {
+      "name": "b4197fdd-4547-4e96-8ca9-282cfb028eb1"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "b4197fdd-4547-4e96-8ca9-282cfb028eb1"
+    }
+  ]
+}

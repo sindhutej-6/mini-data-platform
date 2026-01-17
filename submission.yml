@@ -1,0 +1,51 @@
+setup:
+  - docker-compose up --build -d
+
+run:
+  # Verify service is up
+  - curl http://localhost:5000/health
+  - curl http://localhost:5000/datasets
+
+test:
+  # 1️⃣ List datasets
+  - curl http://localhost:5000/datasets
+
+  # 2️⃣ Get Sales Orders dataset
+  - curl http://localhost:5000/datasets/<dataset_id_sales_orders>
+
+  # 3️⃣ Get OpenFoodFacts dataset
+  - curl http://localhost:5000/datasets/<dataset_id_openfoodfacts>
+
+  # 4️⃣ Create a run
+  - curl -X POST http://localhost:5000/runs \
+    -H "Content-Type: application/json" \
+    -d "{\"id\":\"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\"job_name\":\"sales_orders_pipeline\",\"status\":\"START\"}"
+
+  # 5️⃣ Add Data Quality result for Sales Orders
+  - curl -X POST http://localhost:5000/runs/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/dq_results \
+    -H "Content-Type: application/json" \
+    -d "{\"dataset_id\":\"<dataset_id_sales_orders>\",\"check_name\":\"row_count_check\",\"success\":true,\"observed_value\":\"100%\",\"success_percentage\":100}"
+
+  # 6️⃣ Fetch Data Quality results (verify)
+  - curl http://localhost:5000/runs/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/dq_results
+
+  # 7️⃣ Send OpenLineage event (OpenFoodFacts → Sales Orders)
+  - curl -X POST http://localhost:5000/openlineage/events \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"eventType\": \"COMPLETE\",
+      \"eventTime\": \"2026-01-16T10:00:00Z\",
+      \"job\": { \"name\": \"sales_orders_pipeline\" },
+      \"run\": { \"id\": \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\" },
+      \"inputs\": [ { \"name\": \"<dataset_id_openfoodfacts>\" } ],
+      \"outputs\": [ { \"name\": \"<dataset_id_sales_orders>\" } ]
+    }"
+
+  # 8️⃣ Check lineage for Sales Orders
+  - curl http://localhost:5000/datasets/<dataset_id_sales_orders>/lineage
+
+  # 9️⃣ Check lineage for OpenFoodFacts
+  - curl http://localhost:5000/datasets/<dataset_id_openfoodfacts>/lineage
+
+  # 🔟 Search test
+  - curl "http://localhost:5000/search?q=sales"
