@@ -49,7 +49,7 @@ and dataset lineage ingestion using OpenLineage-compatible events.
 
 ### Step 1: Clone Repository
 ```bash
-git clone <your-repo-url>
+git clone <repo-url>
 cd mini-data-platform
 ```
 
